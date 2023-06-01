@@ -11,6 +11,14 @@
               nixpkgs.legacyPackages.x86_64-linux.platformio
             ];
           };
+          gui = nixpkgs.legacyPackages.x86_64-linux.mkShell {
+            packages = with nixpkgs.legacyPackages.x86_64-linux; [
+              platformio
+              fritzing
+			  code
+			  arduino
+            ];
+          };
         };
       };
 
