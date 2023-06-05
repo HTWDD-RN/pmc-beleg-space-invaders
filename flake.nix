@@ -3,24 +3,25 @@
 
   outputs = { self, nixpkgs }: {
 
-      formatter.x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.nixpkgs-fmt;
-      devShells = {
-        x86_64-linux = {
+    formatter.x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.nixpkgs-fmt;
+    devShells = {
+      x86_64-linux = {
           pio = nixpkgs.legacyPackages.x86_64-linux.mkShell {
             packages = [
               nixpkgs.legacyPackages.x86_64-linux.platformio
             ];
           };
           gui = nixpkgs.legacyPackages.x86_64-linux.mkShell {
-            packages = with nixpkgs.legacyPackages.x86_64-linux; [
-              platformio
-              fritzing
-			  code
-			  arduino
-            ];
+            packages =
+              with nixpkgs.legacyPackages.x86_64-linux; [
+                platformio
+                fritzing
+                kicad
+                arduino
+              ];
           };
         };
-      };
+    };
 
   };
 }
