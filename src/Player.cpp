@@ -32,14 +32,6 @@ int Player::getY(){
 
 void Player::moveTo(int x, int y, TFT disp){
 	if (x != xpos || y != ypos) {
-		Serial.print("x: ");
-		Serial.print(x);
-		Serial.print(" y: ");
-		Serial.print(y);
-		Serial.print(" xpos: ");
-		Serial.print(xpos);
-		Serial.print(" ypos: ");
-		Serial.println(ypos);
 		this->unDraw(disp);
 		hasMoved = true;
 	}

@@ -5,6 +5,7 @@
 
 #include <Enemy.h>
 #include <Player.h>
+#include <Bullet.h>
 
 #ifndef LED_BUILTIN
 #define LED_BUILTIN 13
@@ -13,7 +14,8 @@
 #define cs 10
 #define dc 9
 #define rst 8
-#define numEnemy 3
+#define numEnemy 4
+#define button 7
 
 //gyro
 //https://howtomechatronics.com/tutorials/arduino/arduino-and-mpu6050-accelerometer-and-gyroscope-tutorial/
@@ -29,12 +31,18 @@ float elapsedTime, currentTime, previousTime;
 TFT myScreen = TFT(cs, dc, rst);
 Enemy e[numEnemy];
 //Enemy e = Enemy(10, 10);
-Player p = Player(50, 50);
+Player p = Player(50, 110);
 int offset = 0;
 int playerOffset = 0;
 bool direction = true;
+bool shooting = false;
+int tick = 0;
+Bullet bullet = Bullet(1,1);
 
+void sensorSetup();
 void readSensor();
+void youWon();
+void(* resetFunc) (void) = 0; //declare reset function @ address 0
 
 void setup() {
 	Serial.begin(115200);
@@ -44,7 +52,94 @@ void setup() {
 	myScreen.setTextSize(2);
 
 	//gyro init
+	sensorSetup();
+
+	pinMode(button, INPUT_PULLUP);
 	
+
+	for(int i = 0; i < numEnemy; i++){
+		e[i] = Enemy(10+i*20, 10);
+	}
+	for(int i = 0; i < numEnemy; i++){
+		e[i].render();
+		e[i].draw(myScreen);
+	}
+	p.draw(myScreen);
+}
+
+void loop() {
+	tick++;
+	if (tick > 1000000) {
+		tick = 0;
+	}
+	readSensor();
+
+	//shoot if the button i pressed
+	if (!digitalRead(button)) {
+		Serial.println("shoot");
+		bullet.moveTo(p.getX(), p.getY(), myScreen);
+		shooting = true;
+	}
+
+	//after button press move bullet up in every second loop iteration
+	if (shooting && tick % 2 == 0) {
+		bullet.moveTo(bullet.getX(), bullet.getY()-1, myScreen);
+	}
+
+	//dont move the bullet out of the screen
+	if (shooting && bullet.getY() < 3) {
+		shooting = false;
+	}
+
+	//check for colission
+	int numKills = 0;
+	if (shooting && bullet.getY() < 20 && bullet.getY() > 10) {
+		for (int i = 0; i < numEnemy; i++) {
+			int x = e[i].getX();
+			if(bullet.getX() >= x-5 && bullet.getX() <= x+10){
+				Serial.println();
+				Serial.println("HIT HIT HIT");
+				Serial.println();
+				e[i].hit();
+				Serial.println(e[i].getHP());
+				shooting = false;
+			}
+			if (e[i].getHP() <= 0) {
+				numKills++;
+			}
+		}
+	}
+	//spiel beenden und resetten
+	if (numKills == numEnemy) {
+		youWon();
+	}
+	playerOffset = playerOffset + 30 * AccX;
+
+	for(int i = 0; i < numEnemy; i++){
+		e[i].moveTo(10 + i * 20 + offset / 4, 10, myScreen);
+	}
+	//delay(100);
+	if (direction) {
+		offset++;
+	}else {
+		offset--;
+	}
+	p.moveTo(50+playerOffset, 110, myScreen);
+
+	//dont let the player go outside the screen area
+	if (playerOffset > 110) {
+		playerOffset = 110;
+	}
+	if (playerOffset < -50) {
+		playerOffset = -50;
+	}
+
+	if (offset > 300 || offset < 0) {
+		direction = !direction;
+	}
+}
+
+void sensorSetup(){
 	Wire.begin();                      // Initialize comunication
 	Wire.beginTransmission(MPU);       // Start communication with MPU6050 // MPU=0x68
 	Wire.write(0x6B);                  // Talk to the register 6B
@@ -61,56 +156,6 @@ void setup() {
 	Wire.write(0x1B);                   // Talk to the GYRO_CONFIG register (1B hex)
 	Wire.write(0x10);                   // Set the register bits as 00010000 (1000deg/s full scale)
 	Wire.endTransmission(true);
-
-	for(int i = 0; i < 5; i++){
-		e[i] = Enemy(10+i*20, 10);
-	}
-	for(int i = 0; i < numEnemy; i++){
-		e[i].render();
-		e[i].draw(myScreen);
-	}
-	p.draw(myScreen);
-}
-
-void loop() {
-	readSensor();
-
-	playerOffset = playerOffset + 30 * AccX;
-	//if (AccX < -0.05f) {
-	//	Serial.println("links");
-	//	playerOffset--;
-	//}
-
-	//if (AccX > 0.05f) {
-	//	Serial.println("rechts");
-	//	playerOffset++;
-	//}
-
-	//e.moveTo(10 + offset/8, 10, myScreen);
-	for(int i = 0; i < numEnemy; i++){
-		e[i].moveTo(10 + i * 20 + offset / 4, 10, myScreen);
-	}
-	Serial.println(offset);
-	delay(10);
-	if (direction) {
-		offset++;
-	}else {
-		offset--;
-	}
-	p.moveTo(50+playerOffset, 80, myScreen);
-	Serial.println(playerOffset);
-
-	//dont let the player go outside the screen area
-	if (playerOffset > 110) {
-		playerOffset = 110;
-	}
-	if (playerOffset < -50) {
-		playerOffset = -50;
-	}
-
-	if (offset > 300 || offset < 0) {
-		direction = !direction;
-	}
 }
 
 void readSensor(){
@@ -125,8 +170,8 @@ void readSensor(){
 	// Calculating Roll and Pitch from the accelerometer data
 	accAngleX = (atan(AccY / sqrt(pow(AccX, 2) + pow(AccZ, 2))) * 180 / PI) - 0.58; // AccErrorX ~(0.58) See the calculate_IMU_error()custom function for more details
 	accAngleY = (atan(-1 * AccX / sqrt(pow(AccY, 2) + pow(AccZ, 2))) * 180 / PI) + 1.58; // AccErrorY ~(-1.58)
-	Serial.print("accx: ");
-	Serial.print(AccX);
+	//Serial.print("accx: ");
+	//Serial.print(AccX);
 
 	previousTime = currentTime;        // Previous time is stored before the actual time read
 	currentTime = millis();            // Current time actual time read
@@ -140,4 +185,12 @@ void readSensor(){
 	GyroZ = (Wire.read() << 8 | Wire.read()) / 131.0;
 	//Serial.print(" gyrox: ");
 	//Serial.println(GyroX);
+}
+
+void youWon(){
+	myScreen.background(0,0,0);
+	myScreen.stroke(255,255,255);
+	myScreen.text("You Won!", 40, 50);
+	delay(5000);
+	resetFunc();
 }

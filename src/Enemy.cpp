@@ -11,7 +11,11 @@ Enemy::Enemy(){
 }
 
 void Enemy::draw(TFT disp){
-	disp.stroke(255,255,255);
+	if (hp > 0) {
+		disp.stroke(255,255,255);
+	}else{
+		disp.stroke(0,0,0);
+	}
 	for (int i = 0; i < sizeof(lines) / sizeof(line); i++) {
 		line l = lines[i];
 		disp.line(l.x1, l.y1, l.x2,l.y2);
@@ -24,6 +28,10 @@ void Enemy::unDraw(TFT disp){
 		line l = lines[i];
 		disp.line(l.x1, l.y1, l.x2,l.y2);
 	}
+}
+
+void Enemy::hit(){
+	hp = hp - 5;
 }
 
 void Enemy::render(){
