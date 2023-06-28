@@ -75,15 +75,16 @@ void setup() {
 void loop() {
 	readSensor();
 
-	if (AccX < -0.05f) {
-		Serial.println("links");
-		playerOffset--;
-	}
+	playerOffset = playerOffset + 30 * AccX;
+	//if (AccX < -0.05f) {
+	//	Serial.println("links");
+	//	playerOffset--;
+	//}
 
-	if (AccX > 0.05f) {
-		Serial.println("rechts");
-		playerOffset++;
-	}
+	//if (AccX > 0.05f) {
+	//	Serial.println("rechts");
+	//	playerOffset++;
+	//}
 
 	//e.moveTo(10 + offset/8, 10, myScreen);
 	for(int i = 0; i < numEnemy; i++){
