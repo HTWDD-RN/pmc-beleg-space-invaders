@@ -15,7 +15,7 @@ class Enemy {
 		void draw(TFT disp);
 		void unDraw(TFT disp);
 		void render();
-		void moveTo(int x, int y);
+		void moveTo(int x, int y, TFT disp);
 		int getX();
 		int getY();
 		int getHP();
@@ -24,5 +24,5 @@ class Enemy {
 		int xpos;
 		int ypos;
 		int hp = 10;
-		int hasMoved = 0;
+		bool hasMoved = false;
 };

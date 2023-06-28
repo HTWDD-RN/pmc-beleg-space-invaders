@@ -11,21 +11,18 @@ Enemy::Enemy(){
 }
 
 void Enemy::draw(TFT disp){
-	if (hp > 0 && hasMoved == 1) {
-		disp.stroke(255,255,255);
-		for (int i = 0; i < sizeof(lines) / sizeof(line); i++) {
-			line l = lines[i];
-			disp.line(l.x1, l.y1, l.x2,l.y2);
-		}
-		hasMoved = 2;
+	disp.stroke(255,255,255);
+	for (int i = 0; i < sizeof(lines) / sizeof(line); i++) {
+		line l = lines[i];
+		disp.line(l.x1, l.y1, l.x2,l.y2);
 	}
+	Serial.println("draw");
 }
 
 void Enemy::unDraw(TFT disp){
-	if (hp > 0 && hasMoved == 2) {
-		disp.fill(0,0,0);
-		disp.rect(xpos-5,ypos,xpos+10,ypos+10);
-	}
+	disp.fill(0,0,0);
+	disp.rect(xpos-5,ypos,xpos+10,ypos+10);
+	Serial.println("undraw");
 }
 
 void Enemy::render(){
@@ -55,12 +52,26 @@ int Enemy::getY(){
 	return ypos;
 }
 
-void Enemy::moveTo(int x, int y){
+void Enemy::moveTo(int x, int y, TFT disp){
 	if (x != xpos || y != ypos) {
-		hasMoved = 1;
+		Serial.print("x: ");
+		Serial.print(x);
+		Serial.print(" y: ");
+		Serial.print(y);
+		Serial.print(" xpos: ");
+		Serial.print(xpos);
+		Serial.print(" ypos: ");
+		Serial.println(ypos);
+		this->unDraw(disp);
+		hasMoved = true;
 	}
 	xpos = x;
 	ypos = y;
+	if (hasMoved) {
+		this->render();
+		this->draw(disp);
+		hasMoved = false;
+	}
 }
 
 int Enemy::getHP(){

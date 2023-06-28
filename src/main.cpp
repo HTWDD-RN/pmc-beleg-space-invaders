@@ -13,7 +13,8 @@
 #define rst 8
 
 TFT myScreen = TFT(cs, dc, rst);
-Enemy e[5];
+//Enemy e[5];
+Enemy e = Enemy(10, 10);
 Player p = Player(50, 50);
 int offset = 0;
 bool direction = true;
@@ -25,30 +26,29 @@ void setup() {
     myScreen.background(0,0,0);
 	myScreen.setTextSize(2);
 
-	for(int i = 0; i < 5; i++){
-		e[i] = Enemy(10+i*20, 10);
-	}
+	//for(int i = 0; i < 5; i++){
+	//	e[i] = Enemy(10+i*20, 10);
+	//}
+	//for(int i = 0; i < 5; i++){
+	//	e[i].render();
+	//	e[i].draw(myScreen);
+	//}
+	e.draw(myScreen);
 }
 
 void loop() {
-	p.draw(myScreen);
-	for(int i = 0; i < 5; i++){
-		e[i].moveTo(10 + i * 20 + offset / 4, 10);
-		e[i].render();
-		e[i].draw(myScreen);
-	}
+	e.moveTo(10 + offset/8, 10, myScreen);
+	//for(int i = 0; i < 5; i++){
+	//	e[i].moveTo(10 + i * 20 + offset, 10, myScreen);
+	//}
 	delay(10);
-	p.unDraw(myScreen);
-	for(int i = 0; i < 5; i++){
-		e[i].unDraw(myScreen);
-	}
 	if (direction) {
 		offset++;
 	}else {
 		offset--;
 	}
 
-	if (offset > 80 || offset < 0) {
+	if (offset > 100 || offset < 0) {
 		direction = !direction;
 	}
 }
