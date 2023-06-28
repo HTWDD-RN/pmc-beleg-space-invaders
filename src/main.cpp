@@ -97,6 +97,15 @@ void loop() {
 		offset--;
 	}
 	p.moveTo(50+playerOffset, 80, myScreen);
+	Serial.println(playerOffset);
+
+	//dont let the player go outside the screen area
+	if (playerOffset > 110) {
+		playerOffset = 110;
+	}
+	if (playerOffset < -50) {
+		playerOffset = -50;
+	}
 
 	if (offset > 300 || offset < 0) {
 		direction = !direction;
