@@ -19,8 +19,11 @@ void Enemy::draw(TFT disp){
 }
 
 void Enemy::unDraw(TFT disp){
-	disp.fill(0,0,0);
-	disp.rect(xpos-5,ypos,xpos+10,ypos+10);
+	disp.stroke(0,0,0);
+	for (int i = 0; i < sizeof(lines) / sizeof(line); i++) {
+		line l = lines[i];
+		disp.line(l.x1, l.y1, l.x2,l.y2);
+	}
 }
 
 void Enemy::render(){
