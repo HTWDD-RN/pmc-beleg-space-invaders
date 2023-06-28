@@ -16,13 +16,11 @@ void Enemy::draw(TFT disp){
 		line l = lines[i];
 		disp.line(l.x1, l.y1, l.x2,l.y2);
 	}
-	Serial.println("draw");
 }
 
 void Enemy::unDraw(TFT disp){
 	disp.fill(0,0,0);
 	disp.rect(xpos-5,ypos,xpos+10,ypos+10);
-	Serial.println("undraw");
 }
 
 void Enemy::render(){
@@ -54,14 +52,6 @@ int Enemy::getY(){
 
 void Enemy::moveTo(int x, int y, TFT disp){
 	if (x != xpos || y != ypos) {
-		Serial.print("x: ");
-		Serial.print(x);
-		Serial.print(" y: ");
-		Serial.print(y);
-		Serial.print(" xpos: ");
-		Serial.print(xpos);
-		Serial.print(" ypos: ");
-		Serial.println(ypos);
 		this->unDraw(disp);
 		hasMoved = true;
 	}
