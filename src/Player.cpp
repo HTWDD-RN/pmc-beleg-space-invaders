@@ -11,7 +11,7 @@ Player::Player(){
 }
 
 void Player::draw(TFT disp){
-	disp.stroke(255,255,255);
+	disp.stroke(128,0,255);
 	disp.line(xpos,ypos,xpos+10,ypos+3);
 	disp.line(xpos,ypos,xpos-10,ypos+3);
 }
