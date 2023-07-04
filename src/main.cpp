@@ -113,18 +113,25 @@ void loop() {
 	if (numKills == numEnemy) {
 		youWon();
 	}
-	playerOffset = playerOffset + 30 * AccX;
 
+	//player movement from gyro value
+	playerOffset = playerOffset + 30 * AccX;
+	p.moveTo(50+playerOffset, 110, myScreen);
+
+	//move enemys
 	for(int i = 0; i < numEnemy; i++){
 		e[i].moveTo(10 + i * 20 + offset / 4, 10, myScreen);
 	}
-	//delay(100);
+
+	//toggle Enemy movement
+	if (offset > 300 || offset < 0) {
+		direction = !direction;
+	}
 	if (direction) {
 		offset++;
 	}else {
 		offset--;
 	}
-	p.moveTo(50+playerOffset, 110, myScreen);
 
 	//dont let the player go outside the screen area
 	if (playerOffset > 110) {
@@ -132,10 +139,6 @@ void loop() {
 	}
 	if (playerOffset < -50) {
 		playerOffset = -50;
-	}
-
-	if (offset > 300 || offset < 0) {
-		direction = !direction;
 	}
 }
 
